@@ -41,13 +41,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Screenshot
 
-If you want to show the app without asking people to run it, add a screenshot file to the repo and reference it here:
+If the screenshot file exists in the repo, GitHub will render it automatically:
 
-```md
-![AI Extraction Dashboard](./public/demo-screenshot.png)
-```
+![AI Extraction Dashboard](public/demo-screenshot.png)
 
-Place your screenshot file at `public/demo-screenshot.png`, then commit it with the repo.
+Make sure `public/demo-screenshot.png` is saved, committed, and pushed to GitHub.
 
 ## Environment variables
 
