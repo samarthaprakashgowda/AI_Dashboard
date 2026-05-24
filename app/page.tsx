@@ -1,65 +1,136 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+
+interface DashboardData {
+  totalExpenses: number;
+  highestCategory: string;
+  overdraftRisk: boolean;
+  tips: string[];
+}
 
 export default function Home() {
+  const [inputLog, setInputLog] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const isDashboardData = (value: unknown): value is DashboardData => {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      typeof (value as any).totalExpenses === 'number' &&
+      typeof (value as any).highestCategory === 'string' &&
+      typeof (value as any).overdraftRisk === 'boolean' &&
+      Array.isArray((value as any).tips)
+    );
+  };
+
+  const handleAnalyze = async () => {
+    if (!inputLog.trim()) return;
+    setLoading(true);
+    setData(null);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputLog.trim() }),
+      });
+      const result = await response.json();
+
+      if (response.ok && isDashboardData(result)) {
+        setData(result);
+      } else {
+        const message =
+          result?.error ||
+          'Unexpected API response. Please try again.';
+        console.error('Invalid analysis response:', result);
+        setError(message);
+      }
+    } catch (err) {
+      console.error('Error fetching analysis:', err);
+      setError('Failed to fetch analysis. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-slate-900 text-slate-100 p-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold">AI Extraction Dashboard</h1>
+          <p className="text-slate-400">Convert messy financial logs into type-safe user interfaces.</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Action Panel */}
+        <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+          <textarea
+            className="w-full h-32 bg-slate-950 border border-slate-700 rounded-lg p-4 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Paste a chaotic message here... (e.g., 'Spent 40 bucks on fuel, 20 on food, rent was 1200, balance is down to 10 bucks.')"
+            value={inputLog}
+            onChange={(e) => setInputLog(e.target.value)}
+          />
+          <button
+            onClick={handleAnalyze}
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 text-white font-medium rounded-lg transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {loading ? 'Processing Cloud Models...' : 'Analyze Log'}
+          </button>
         </div>
-      </main>
-    </div>
+
+        {error && (
+          <div className="rounded-xl border border-red-700 bg-red-900/20 p-4 text-red-200">
+            <strong className="block font-semibold">Unable to analyze log.</strong>
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Dynamic Generative Dashboard Grid */}
+        {data && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fadeIn">
+            {/* Metric Card 1 */}
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Total Expenses</h3>
+              <p className="text-3xl font-bold mt-2 text-emerald-400">${data.totalExpenses.toFixed(2)}</p>
+            </div>
+
+            {/* Metric Card 2 */}
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Top Category</h3>
+              <p className="text-3xl font-bold mt-2 text-blue-400 capitalize">{data.highestCategory}</p>
+            </div>
+
+            {/* Metric Card 3 */}
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Risk Status</h3>
+              <div className="mt-2">
+                {data.overdraftRisk ? (
+                  <span className="px-3 py-1 bg-red-900/50 text-red-400 border border-red-700 text-sm rounded-full font-bold">CRITICAL OVERDRAFT RISK</span>
+                ) : (
+                  <span className="px-3 py-1 bg-emerald-900/50 text-emerald-400 border border-emerald-700 text-sm rounded-full font-bold">ACCOUNT HEALTHY</span>
+                )}
+              </div>
+            </div>
+
+            {/* AI Generated Insights Section */}
+            <div className="md:col-span-3 bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="text-md font-semibold text-slate-200 mb-4">Cloud-Generated Financial Strategy</h3>
+              <ul className="space-y-2">
+                {data.tips.map((tip, idx) => (
+                  <li key={idx} className="flex items-start gap-2 text-slate-300">
+                    <span className="text-blue-500 font-bold">•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Extraction Dashboard
 
-## Getting Started
+This is a Next.js dashboard app that converts messy financial logs into structured financial data using AI.
 
-First, run the development server:
+## What this project does
+
+- Provides a frontend UI to paste a financial text log
+- Sends the log text to a server API route
+- Uses AI to extract structured data from the text
+- Displays the result as dashboard cards
+- Uses schema validation to ensure the output is reliable
+- Includes a mock fallback so the app runs even without AI credentials
+
+## Key features
+
+- `app/page.tsx`: React client page with textarea, submit button, and dashboard cards
+- `app/api/analyze/route.ts`: server API route that processes text and returns structured results
+- `zod` validation: ensures the returned object has the correct shape
+- AI integration: supports Google AI Studio key and Vercel AI Gateway key
+- Local fallback: returns mock data when no valid API key is configured
+
+## Tech stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- Vercel AI SDK (`ai`)
+- Google AI provider (`@ai-sdk/google`)
+- `zod` for schema validation
+
+## Local setup
+
+```bash
+cd ai-dashboard
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Screenshot
+
+If you want to show the app without asking people to run it, add a screenshot file to the repo and reference it here:
+
+```md
+![AI Extraction Dashboard](./public/demo-screenshot.png)
+```
+
+Place your screenshot file at `public/demo-screenshot.png`, then commit it with the repo.
+
+## Environment variables
+
+Create or update `./.env.local` with either of these keys:
+
+```env
+# Use if you have Google AI Studio credentials
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_studio_key
+
+# Use if you want Vercel AI Gateway instead
+AI_GATEWAY_API_KEY=your_vercel_ai_gateway_key
+```
+
+### Note
+If no valid key is present, the app still works using a mock fallback. That means you can still demo the UI and pipeline even without AI credentials.
+
+## How the AI route works
+
+- The client calls `/api/analyze` with the user input text
+- The API route checks for `GOOGLE_GENERATIVE_AI_API_KEY` and `AI_GATEWAY_API_KEY`
+- If a key exists, it calls AI to extract structured financial data
+- If no key exists, it returns a local mock result
+- The result is validated against `FinancialSchema`
+
+## Deploying to Vercel
+
+1. Push this repo to GitHub or another Git provider
+2. Import the project on Vercel
+3. Add environment variables in Vercel:
+   - `GOOGLE_GENERATIVE_AI_API_KEY` or
+   - `AI_GATEWAY_API_KEY`
+4. Deploy the app
+
+If you don’t want to add a key, the deployed app still runs with the local mock fallback.
+
+## Why this is a good AI demo
+
+- Demonstrates frontend + backend AI integration
+- Shows how to use schema validation for AI output
+- Includes a safe fallback path for demos without credentials
+- Uses a real AI SDK and an actual provider model
+
+## Useful commands
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Files to highlight
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `app/page.tsx` — frontend analysis UI
+- `app/api/analyze/route.ts` — AI extraction route
+- `.env.local` — store your API keys here
+- `package.json` — project dependencies and scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you want, I can also add a brief project description section for your portfolio or resume entry.
