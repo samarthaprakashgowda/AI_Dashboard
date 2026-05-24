@@ -41,11 +41,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Screenshot
 
-If the screenshot file exists in the repo, GitHub will render it automatically:
 
 ![AI Extraction Dashboard](public/demo-screenshot.png)
-
-Make sure `public/demo-screenshot.png` is saved, committed, and pushed to GitHub.
 
 ## Environment variables
 
@@ -105,5 +102,3 @@ npm run lint
 - `package.json` — project dependencies and scripts
 
 ---
-
-If you want, I can also add a brief project description section for your portfolio or resume entry.
