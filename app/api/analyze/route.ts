@@ -33,6 +33,7 @@ const FinancialSchema = z.object({
 export async function POST(req: Request) {
   try {
     const { text } = await req.json();
+
     // const knowledgeItems = [
     //   "rent → housing",
     //   "food, groceries, dining → food",
