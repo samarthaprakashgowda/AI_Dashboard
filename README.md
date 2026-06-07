@@ -34,6 +34,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 
 ![AI Extraction Dashboard](public/demo-screenshot.png)
+![AI Extraction Dashboard - improved](public/version-2.png)
 
 ## Environment variables
 
