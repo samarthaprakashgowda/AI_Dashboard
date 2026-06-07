@@ -56,7 +56,12 @@ export async function POST(req: Request) {
     //   }
     // }
 
-    const queryEmbedding = await getEmbedding(text);
+    // const queryEmbedding = await getEmbedding(text);
+    let queryEmbedding: number[] | null = null;
+
+    if (process.env.NODE_ENV === 'development') {
+      queryEmbedding = await getEmbedding(text);
+    }
 
     const { data, error } = await supabase.rpc('match_documents', {
       query_embedding: queryEmbedding,
@@ -65,17 +70,24 @@ export async function POST(req: Request) {
 
     let knowledge = '';
 
-    if (error || !data || data.length === 0) {
-      console.warn("Supabase failed, using fallback knowledge");
+    if (queryEmbedding) {
+      const { data, error } = await supabase.rpc('match_documents', {
+        query_embedding: queryEmbedding,
+        match_count: 2
+      });
 
+      if (!error && data && data.length > 0) {
+        knowledge = data.map((d: any) => d.content).join('\n');
+      }
+    }
+
+    if (!knowledge) {
       knowledge = `
       rent → housing
       food → groceries
       fuel → transport
       shopping → discretionary
       `;
-    } else {
-      knowledge = data.map((d: any) => d.content).join('\n');
     }
 
 //Coffee 5, snacks 10, lunch 15
