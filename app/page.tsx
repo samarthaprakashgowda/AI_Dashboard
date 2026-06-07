@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 interface DashboardData {
+  confidence: number;
   totalExpenses: number;
   highestCategory: string;
   overdraftRisk: boolean;
@@ -62,7 +63,10 @@ export default function Home() {
       <div className="max-w-5xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold">AI Extraction Dashboard</h1>
-          <p className="text-slate-400">Convert messy financial logs into type-safe user interfaces.</p>
+          <p className="text-slate-400">A financial log analysis app using Retrieval-Augmented Generation (RAG),
+              local embeddings, and a Supabase vector database to convert unstructured
+              inputs into structured insights.
+          </p>
         </div>
 
         {/* Action Panel */}
@@ -114,6 +118,12 @@ export default function Home() {
                   <span className="px-3 py-1 bg-emerald-900/50 text-emerald-400 border border-emerald-700 text-sm rounded-full font-bold">ACCOUNT HEALTHY</span>
                 )}
               </div>
+            </div>
+
+            {/* Metric Card 4 */}
+            <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
+              <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Confidence</h3>
+              <p className="text-3xl font-bold mt-2 text-purple-400">{(data.confidence * 100).toFixed(0)}%</p>
             </div>
 
             {/* AI Generated Insights Section */}
